@@ -1,18 +1,24 @@
 #ifndef SKIP_LIST
 #define SKIP_LIST
+#include "SkipListNode.h"
 
-template <class T>
+class SkipListNode;
+
 class SkipList{
+
 public:
-	SkipList(); //Constructor
-	void add(T);
-	bool remove(T);
-	bool contains(T);
+	SkipList();
+	SkipListNode *head;
+	void add(int value);
+	bool remove(int value);
+	bool contains(int value);
 
 private:
-	SkipListNode getLeftNode(SkipListNode);
-	SkipListNode findValue(T);
 
+
+
+	SkipListNode getLeftNode(SkipListNode *left);
+	SkipListNode findValue(int value);
 };
 
 #endif
