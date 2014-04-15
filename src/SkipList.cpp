@@ -10,8 +10,12 @@ class SkipListNode;
 		this->head->setRight(right);
 	}
 
-	void add(int){
+	void add(int value){
+		SkipListNode *newNode = new SkipListNode(value);
+		while(true){
 
+
+		}
 	}
 
 	bool remove(int){

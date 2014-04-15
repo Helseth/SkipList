@@ -14,9 +14,6 @@ public:
 	bool contains(int value);
 
 private:
-
-
-
 	SkipListNode getLeftNode(SkipListNode *left);
 	SkipListNode findValue(int value);
 };
