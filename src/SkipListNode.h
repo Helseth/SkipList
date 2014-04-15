@@ -8,10 +8,10 @@ public:
 	SkipListNode();
 	SkipListNode(int value);
 
-	SkipListNode getUp();
-	SkipListNode getDown();
-	SkipListNode getLeft();
-	SkipListNode getRight();
+	SkipListNode* getUp();
+	SkipListNode* getDown();
+	SkipListNode* getLeft();
+	SkipListNode* getRight();
 	void setUp(SkipListNode *up);
 	void setDown(SkipListNode *down);
 	void setLeft(SkipListNode *left);
