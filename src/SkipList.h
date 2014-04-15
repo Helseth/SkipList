@@ -8,13 +8,14 @@ class SkipList{
 
 public:
 	SkipList();
+	int depth;
 	SkipListNode *head;
 	void add(int value);
 	bool remove(int value);
 	bool contains(int value);
 
 private:
-	SkipListNode getLeftNode(SkipListNode *left);
+	bool coinFlip();
 	SkipListNode findValue(int value);
 };
 

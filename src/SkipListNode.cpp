@@ -2,13 +2,13 @@
 #include "SkipListNode.h"
 
 
-	SkipListNode::SkipListNode(){ //Special case for initial construction
-		this->value = INT_MIN;
-		this->up = NULL;
-		this->down = NULL;
-		this->left = NULL;
-		this->right = NULL;
-	}
+	//SkipListNode::SkipListNode(){ //Special case for initial construction
+	//	this->value = INT_MIN;
+	//	this->up = NULL;
+	//	this->down = NULL;
+	//	this->left = NULL;
+	//	this->right = NULL;
+	//}
 	SkipListNode::SkipListNode(int value){ //Contructor
 		this->value = value;
 		this->up = NULL;

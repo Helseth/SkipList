@@ -5,7 +5,7 @@ class SkipListNode{
 
 public:
 
-	SkipListNode();
+	//SkipListNode();
 	SkipListNode(int value);
 
 	SkipListNode* getUp();
