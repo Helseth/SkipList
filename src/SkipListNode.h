@@ -5,7 +5,6 @@ class SkipListNode{
 
 public:
 
-	//SkipListNode();
 	SkipListNode(int value);
 
 	SkipListNode* getUp();
@@ -18,12 +17,6 @@ public:
 	void setRight(SkipListNode *right);
 	int getValue();
 	void setValue(int value);
-	friend bool operator==(const SkipListNode& lhs, const SkipListNode& rhs);
-	friend bool operator!=(const SkipListNode& lhs, const SkipListNode& rhs);
-	friend bool operator<(const SkipListNode& lhs, const SkipListNode& rhs);
-	friend bool operator<=(const SkipListNode& lhs, const SkipListNode& rhs);
-	friend bool operator>(const SkipListNode& lhs, const SkipListNode& rhs);
-	friend bool operator>=(const SkipListNode& lhs, const SkipListNode& rhs);
 
 private:
 

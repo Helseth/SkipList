@@ -16,6 +16,10 @@ class SkipListNode;
 	}
 
 	void SkipList::add(int value){
+		bool contains = this->contains(value);
+		if(contains)
+			return; //For right now, don't allow duplicate keys
+
 		SkipListNode *curr = this->head;
 		SkipListNode *newNode = new SkipListNode(value);
 		while(true){
@@ -23,6 +27,7 @@ class SkipListNode;
 				curr = curr->getRight();
 				continue;
 			}
+
 			else if(newNode->getValue() < curr->getRight()->getValue() && curr->getRight() != NULL && curr->getDown() == NULL){ //Check right, if less than and in bottom row, add our node
 				newNode->setRight(curr->getRight());
 				curr->getRight()->setLeft(newNode);
@@ -30,6 +35,7 @@ class SkipListNode;
 				newNode->setLeft(curr);
 				break; //Exit loop, we've found our spot to add
 			}
+
 			else{
 				curr = curr->getDown(); //Otherwise move down
 				continue;
@@ -61,12 +67,14 @@ class SkipListNode;
 					while(farLeft->getUp() == NULL){ //Iterate all the way to the left in the current layer while up is NULL
 						farLeft = farLeft->getLeft();
 					}
+
 					stackedNode->setLeft(farLeft->getUp());
 				}
 
 				while(farRight->getRight() != NULL){ //iterate from newNode all the way right until it can go up
 					if(farRight->getRight()->getUp() == NULL)
 						farRight = farRight->getRight();
+
 					farRight = farRight->getRight();
 				}
 
@@ -89,8 +97,36 @@ class SkipListNode;
 			addTopLayer();
 	}
 
-	bool remove(int){
-		return true;
+	bool SkipList::remove(int value){
+		if(!this->contains(value)) //It's not here
+			return false;
+
+		if(value == INT_MIN || value == INT_MAX) //Pls don't delete an edge node
+			return false;
+
+		SkipListNode *curr = this->head;
+		while(curr->getDown() != NULL){ //Go alllll the way down
+			curr = curr->getDown();
+		}
+
+		while(curr->getRight() != NULL){ //Check right, if we're it, cool, if not move right
+			if(curr->getValue() == value){
+				curr->getLeft()->setRight(curr->getRight());
+				curr->getRight()->setLeft(curr->getLeft());
+				while(curr->getUp() != NULL){
+					curr->getLeft()->setRight(curr->getRight());
+					curr->getRight()->setLeft(curr->getLeft());
+					curr = curr->getUp();
+					delete curr->getDown();
+				}
+
+				delete curr;
+				return true;
+			}
+			curr = curr->getRight();
+		}
+		std::cout << "Uh oh something went wrong with deleting the node with value " << curr->getValue() << "\n";
+		return false; //Well you shouldn't be able to get here, but if you did good job you broke shit
 	}
 
 	bool SkipList::contains(int value){
@@ -102,6 +138,7 @@ class SkipListNode;
 		while(curr->getRight() != NULL){ //Check right, if it's here cool, if not move right
 			if(curr->getValue() == value)
 				return true;
+
 			curr = curr->getRight();
 		}
 
