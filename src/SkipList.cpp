@@ -93,8 +93,19 @@ class SkipListNode;
 		return true;
 	}
 
-	bool contains(int){
-		return true;
+	bool SkipList::contains(int value){
+		SkipListNode *curr = this->head;
+		while(curr->getDown() != NULL){ //Go alllll the way down
+			curr = curr->getDown();
+		}
+
+		while(curr->getRight() != NULL){ //Check right, if it's here cool, if not move right
+			if(curr->getValue() == value)
+				return true;
+			curr = curr->getRight();
+		}
+
+		return false; //Nope not here
 	}
 
 	bool SkipList::coinFlip(){
