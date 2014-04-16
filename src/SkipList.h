@@ -16,6 +16,7 @@ public:
 
 private:
 	bool coinFlip();
+	void addTopLayer();
 	SkipListNode findValue(int value);
 };
 

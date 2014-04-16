@@ -11,7 +11,7 @@ class SkipListNode;
 		this->head = new SkipListNode(INT_MIN);
 		SkipListNode *right = new SkipListNode(INT_MAX);
 		this->head->setRight(right);
-		this->depth = 0;
+		this->depth = 1;
 		srand (time(NULL));
 	}
 
@@ -45,11 +45,43 @@ class SkipListNode;
 			}
 		}
 		bool flip = coinFlip();
+		SkipListNode *farLeft = newNode;
 		while(flip == true){
 				std::cout << "Random coin flip is true\n";
-				//SkipListNode *newHead = new SkipListNode(INT_MIN);
+				while(farLeft->getUp() == NULL && farLeft->getLeft() != NULL){ //Iterate all the way to the left in the current layer while up is NULL
+						farLeft = farLeft->getLeft();
+					}
+				if(farLeft->getUp() == NULL)
+					addTopLayer();
+				
+				SkipListNode *stackedNode = new SkipListNode(value);
+				farLeft = newNode;
+				stackedNode->setDown(newNode);
+				std::cout << "StackedNode down is " << stackedNode->getDown()->getValue() << "\n";
+				if(newNode->getLeft()->getUp() != NULL)
+					stackedNode->setLeft(newNode->getLeft()->getUp());
+				else{
+					while(farLeft->getUp() == NULL){ //Iterate all the way to the left in the current layer while up is NULL
+						farLeft = farLeft->getLeft();
+					}
+					stackedNode->setLeft(farLeft->getUp());
+
+				}
+				stackedNode->setRight(newNode->getRight()->getUp());
+				stackedNode->getLeft()->setRight(stackedNode);
+				stackedNode->getRight()->setLeft(stackedNode);
+				newNode->setUp(stackedNode);
+				newNode = stackedNode;
+				farLeft = newNode;
 				flip = coinFlip();
 			}
+
+		farLeft = newNode;
+		while(farLeft->getLeft() != NULL){ //Iterate all the way to the left in the current layer
+			farLeft = farLeft->getLeft();
+		}
+		if(farLeft->getUp() == NULL) //if the "INT_MIN" node has no up, add a new layer
+			addTopLayer();
 	}
 
 	bool remove(int){
@@ -66,6 +98,34 @@ class SkipListNode;
 		if(flip >= .5)
 			return true;
 		return false;
+	}
+
+	void SkipList::addTopLayer(){
+
+		SkipListNode *newHead = new SkipListNode(INT_MIN);
+		SkipListNode *newTail = new SkipListNode(INT_MAX);
+		SkipListNode *farRight = this->head;
+
+		newHead->setRight(newTail);
+		newHead->setDown(this->head);
+		newTail->setLeft(newHead);
+		this->head->setUp(newHead);
+
+		while(farRight->getRight() != NULL){ //iterate from head all the way right
+			//std::cout << "FarRight is " << farRight->getValue() << "\n";
+			if(farRight->getRight()->getValue() != INT_MAX)
+				farRight = farRight->getRight();
+			else{
+				farRight = farRight->getRight();
+				//std::cout << "FarRight is " << farRight->getValue() << "\n";
+				farRight->setUp(newTail);
+				newTail->setDown(farRight);
+			}
+		}
+
+		this->head = newHead;
+		this->depth++;
+		std::cout << "New top layer added\n";
 	}
 
 	//SkipListNode findValue(int value);
