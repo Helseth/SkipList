@@ -46,6 +46,7 @@ class SkipListNode;
 		}
 		bool flip = coinFlip();
 		SkipListNode *farLeft = newNode;
+		SkipListNode *farRight = newNode;
 		while(flip == true){
 				std::cout << "Random coin flip is true\n";
 				while(farLeft->getUp() == NULL && farLeft->getLeft() != NULL){ //Iterate all the way to the left in the current layer while up is NULL
@@ -67,12 +68,18 @@ class SkipListNode;
 					stackedNode->setLeft(farLeft->getUp());
 
 				}
-				stackedNode->setRight(newNode->getRight()->getUp());
+				while(farRight->getRight() != NULL){ //iterate from newNode all the way right until it can go up
+					if(farRight->getRight()->getUp() == NULL)
+						farRight = farRight->getRight();
+					farRight = farRight->getRight();
+				}
+				stackedNode->setRight(farRight->getUp());
 				stackedNode->getLeft()->setRight(stackedNode);
 				stackedNode->getRight()->setLeft(stackedNode);
 				newNode->setUp(stackedNode);
 				newNode = stackedNode;
 				farLeft = newNode;
+				farRight = newNode;
 				flip = coinFlip();
 			}
 
