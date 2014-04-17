@@ -134,9 +134,6 @@ class SkipListNode;
 		if(!this->contains(value)) //It's not here
 			return false;
 
-		//if(value == INT_MIN || value == INT_MAX) //Pls don't delete an edge node
-		//	return false; Eh maybe we don't care that much, can be used for destructor
-
 		SkipListNode *curr = this->head;
 
 		while(true){
@@ -173,15 +170,21 @@ class SkipListNode;
 
 	bool SkipList::contains(int value){
 		SkipListNode *curr = this->head;
-		while(curr->getDown() != NULL){ //Go alllll the way down
-			curr = curr->getDown();
-		}
-
-		while(curr->getRight() != NULL){ //Check right, if it's here cool, if not move right
-			if(curr->getValue() == value)
+		while(curr->getDown() != NULL || curr->getRight() != NULL){
+			if(curr->getRight()->getValue() == value)
 				return true;
 
-			curr = curr->getRight();
+			if(curr->getRight()->getValue() < value && curr->getRight() != NULL){
+				curr = curr->getRight();
+				continue; //Move right
+			}
+
+			if(curr->getRight()->getValue() > value && curr->getDown() != NULL){
+				curr = curr->getDown();
+				continue; //Move down
+			}
+			else
+				break; //Covers first add case
 		}
 
 		return false; //Nope not here
