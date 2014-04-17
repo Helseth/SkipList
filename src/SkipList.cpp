@@ -15,6 +15,7 @@ class SkipListNode;
 		srand (time(NULL));
 	}
 
+
 	void SkipList::add(int value){
 		bool contains = this->contains(value);
 		if(contains)
