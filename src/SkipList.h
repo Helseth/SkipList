@@ -8,6 +8,7 @@ class SkipList{
 
 public:
 	SkipList();
+	~SkipList();
 	int depth;
 	SkipListNode *head;
 	void add(int value); //Right now can return if skiplist contains node

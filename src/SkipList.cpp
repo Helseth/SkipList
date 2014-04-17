@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
+#include <memory>
 #include "SkipList.h"
 #include "SkipListNode.h"
 
@@ -15,6 +16,37 @@ class SkipListNode;
 		srand (time(NULL));
 	}
 
+	SkipList::~SkipList(){
+		SkipListNode *curr = this->head;
+		while(true){
+			if(curr->getRight() != NULL)
+				curr = curr->getRight();
+
+			if(curr->getDown() != NULL)
+				curr = curr->getDown();
+
+			if(curr->getDown() == NULL && curr->getRight() == NULL){
+				if(curr->getLeft() != NULL && curr->getUp() != NULL){
+					while(curr->getLeft() != NULL)
+						curr = curr->getLeft();
+					while(curr->getRight() != NULL){
+						curr = curr->getRight();
+						delete curr->getLeft();
+					}
+					//delete curr->getLeft();
+					curr = curr->getUp();
+					delete curr->getDown();
+					curr->setDown(NULL); //Make sure this is NULL otherwise we WILL access freed memory, and bad things will happen
+					depth--;
+				}
+				else{
+					delete curr->getLeft(); //We are the onry one reft, so ronery
+					delete curr;
+					return;
+				}
+			}
+		}
+	}
 
 	void SkipList::add(int value){
 		bool contains = this->contains(value);
@@ -102,32 +134,41 @@ class SkipListNode;
 		if(!this->contains(value)) //It's not here
 			return false;
 
-		if(value == INT_MIN || value == INT_MAX) //Pls don't delete an edge node
-			return false;
+		//if(value == INT_MIN || value == INT_MAX) //Pls don't delete an edge node
+		//	return false; Eh maybe we don't care that much, can be used for destructor
 
 		SkipListNode *curr = this->head;
-		while(curr->getDown() != NULL){ //Go alllll the way down
-			curr = curr->getDown();
-		}
 
-		while(curr->getRight() != NULL){ //Check right, if we're it, cool, if not move right
-			if(curr->getValue() == value){
-				curr->getLeft()->setRight(curr->getRight());
-				curr->getRight()->setLeft(curr->getLeft());
-				while(curr->getUp() != NULL){
+		while(true){
+
+			if(curr->getRight()->getValue() < value && curr->getRight() != NULL){
+				curr = curr->getRight();
+				continue; //Move right
+			}
+
+			if(curr->getRight()->getValue() > value && curr->getDown() != NULL){
+				curr = curr->getDown();
+				continue; //Move down
+			}
+
+			if(curr->getRight()->getValue() == value){
+				curr = curr->getRight();
+				while(curr->getDown() != NULL){
 					curr->getLeft()->setRight(curr->getRight());
 					curr->getRight()->setLeft(curr->getLeft());
-					curr = curr->getUp();
-					delete curr->getDown();
+					curr = curr->getDown();
+					delete curr->getUp(); //Rekt that stack of nodes
 				}
 
-				delete curr;
-				return true;
+				curr->getLeft()->setRight(curr->getRight());
+				curr->getRight()->setLeft(curr->getLeft());
+				delete curr; //FINISH HIM
+				return true; 
 			}
-			curr = curr->getRight();
 		}
+
 		std::cout << "Uh oh something went wrong with deleting the node with value " << curr->getValue() << "\n";
-		return false; //Well you shouldn't be able to get here, but if you did good job you broke shit
+		return false; //Well you shouldn't be able to get here, but if you did, good job you broke shit
 	}
 
 	bool SkipList::contains(int value){
