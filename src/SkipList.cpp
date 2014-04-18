@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
-#include <memory>
+#include <pthread.h>
 #include "SkipList.h"
 #include "SkipListNode.h"
 
@@ -13,11 +13,13 @@ class SkipListNode;
 		SkipListNode *right = new SkipListNode(INT_MAX);
 		this->head->setRight(right);
 		this->depth = 1;
+		pthread_mutex_init(&skipListLock, NULL);
 		srand (time(NULL));
 	}
 
 	SkipList::~SkipList(){
 		SkipListNode *curr = this->head;
+		
 		while(true){
 			if(curr->getRight() != NULL)
 				curr = curr->getRight();
@@ -33,15 +35,18 @@ class SkipListNode;
 						curr = curr->getRight();
 						delete curr->getLeft();
 					}
-					//delete curr->getLeft();
+					
 					curr = curr->getUp();
 					delete curr->getDown();
 					curr->setDown(NULL); //Make sure this is NULL otherwise we WILL access freed memory, and bad things will happen
 					depth--;
 				}
+
 				else{
 					delete curr->getLeft(); //We are the onry one reft, so ronery
 					delete curr;
+					
+					pthread_mutex_destroy(&skipListLock);
 					return;
 				}
 			}
@@ -56,8 +61,10 @@ class SkipListNode;
 		SkipListNode *curr = this->head;
 		SkipListNode *newNode = new SkipListNode(value);
 		while(true){
+			
 			if(newNode->getValue() > curr->getRight()->getValue() && curr->getRight() != NULL){ //Check our right, if greater than right, move right
 				curr = curr->getRight();
+				
 				continue;
 			}
 
@@ -66,6 +73,7 @@ class SkipListNode;
 				curr->getRight()->setLeft(newNode);
 				curr->setRight(newNode);
 				newNode->setLeft(curr);
+				
 				break; //Exit loop, we've found our spot to add
 			}
 
@@ -78,7 +86,7 @@ class SkipListNode;
 		bool flip = coinFlip(); //flip our "coin", > 0.5 is true(heads)
 		SkipListNode *farLeft = newNode;
 		SkipListNode *farRight = newNode;
-
+		
 		while(flip == true){ //On a heads flip
 
 				while(farLeft->getUp() == NULL && farLeft->getLeft() != NULL){ //Iterate all the way to the left in the current layer while up is NULL
@@ -120,14 +128,18 @@ class SkipListNode;
 				farRight = newNode;
 				flip = coinFlip(); //Do another flip to see if we need to do this all again
 		}
-
+		 //Done adding the new node, give up the lock
 		farLeft = newNode; //Reset this guy just to be safe
 		while(farLeft->getLeft() != NULL){ //Iterate all the way to the left in the current layer
 			farLeft = farLeft->getLeft();
 		}
 
-		if(farLeft->getUp() == NULL) //if the "INT_MIN" node has no up, add a new layer
+		if(farLeft->getUp() == NULL){ //if the "INT_MIN" node has no up, add a new layer
+			 //May not be needed?
 			addTopLayer();
+			 
+		}
+		
 	}
 
 	bool SkipList::remove(int value){
@@ -137,14 +149,16 @@ class SkipListNode;
 		SkipListNode *curr = this->head;
 
 		while(true){
-
+			
 			if(curr->getRight()->getValue() < value && curr->getRight() != NULL){
 				curr = curr->getRight();
+			
 				continue; //Move right
 			}
 
 			if(curr->getRight()->getValue() > value && curr->getDown() != NULL){
 				curr = curr->getDown();
+				
 				continue; //Move down
 			}
 
@@ -155,11 +169,13 @@ class SkipListNode;
 					curr->getRight()->setLeft(curr->getLeft());
 					curr = curr->getDown();
 					delete curr->getUp(); //Rekt that stack of nodes
+					
 				}
-
+				
 				curr->getLeft()->setRight(curr->getRight());
 				curr->getRight()->setLeft(curr->getLeft());
 				delete curr; //FINISH HIM
+				 //May need to move this up and reacquire?
 				return true; 
 			}
 		}
@@ -170,23 +186,29 @@ class SkipListNode;
 
 	bool SkipList::contains(int value){
 		SkipListNode *curr = this->head;
+
 		while(curr->getDown() != NULL || curr->getRight() != NULL){
-			if(curr->getRight()->getValue() == value)
+			//
+			if(curr->getRight()->getValue() == value){
+				//
 				return true;
+			}
 
 			if(curr->getRight()->getValue() < value && curr->getRight() != NULL){
 				curr = curr->getRight();
+				//
 				continue; //Move right
 			}
 
 			if(curr->getRight()->getValue() > value && curr->getDown() != NULL){
 				curr = curr->getDown();
+				//
 				continue; //Move down
 			}
 			else
 				break; //Covers first add case
 		}
-
+		//
 		return false; //Nope not here
 	}
 
