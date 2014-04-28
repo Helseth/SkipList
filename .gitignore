@@ -13,6 +13,7 @@ tmp/
 *~.nib
 *.sln
 *.vcproj*
+*.vcxproj*
 local.properties
 .classpath
 .settings/
