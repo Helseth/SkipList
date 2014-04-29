@@ -1,6 +1,10 @@
 #ifndef SKIP_LIST_NODE
 #define SKIP_LIST_NODE
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 class SkipListNode{
 
 public:
