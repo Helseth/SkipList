@@ -11,9 +11,9 @@ tmp/
 *.bak
 *.swp
 *~.nib
-#*.sln
+*.sln
 *.vcproj*
-#*.vcxproj*
+*.vcxproj*
 local.properties
 .classpath
 .settings/
